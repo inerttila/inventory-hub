@@ -14,7 +14,7 @@ module.exports = (sequelize) => {
         notEmpty: true
       }
     },
-    product_code: {
+    barcode: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
@@ -22,46 +22,32 @@ module.exports = (sequelize) => {
         notEmpty: true
       }
     },
-    barcode: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      unique: true
-    },
-    price: {
+    price_per_square_meter: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
       validate: {
         min: 0
       }
     },
-    categoryId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'categories',
-        key: 'id'
-      }
-    },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
-    stock_quantity: {
-      type: DataTypes.INTEGER,
+    square_meters: {
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
       defaultValue: 0,
       validate: {
         min: 0
       }
     },
-    unit: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: 'piece'
-    },
-    supplier: {
-      type: DataTypes.STRING,
+    description: {
+      type: DataTypes.TEXT,
       allowNull: true
+    },
+    currencyId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'currencies',
+        key: 'id'
+      }
     }
   }, {
     tableName: 'products',

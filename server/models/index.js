@@ -3,24 +3,31 @@ const Category = require('./Category')(sequelize);
 const Product = require('./Product')(sequelize);
 const FinalProduct = require('./FinalProduct')(sequelize);
 const Component = require('./Component')(sequelize);
+const Currency = require('./Currency')(sequelize);
+const Client = require('./Client')(sequelize);
 
 // Define associations
-Product.belongsTo(Category, { foreignKey: 'categoryId', as: 'category' });
-Category.hasMany(Product, { foreignKey: 'categoryId', as: 'products' });
-
-FinalProduct.belongsTo(Category, { foreignKey: 'categoryId', as: 'category' });
-Category.hasMany(FinalProduct, { foreignKey: 'categoryId', as: 'finalProducts' });
 
 Component.belongsTo(FinalProduct, { foreignKey: 'finalProductId', as: 'finalProduct' });
 Component.belongsTo(Product, { foreignKey: 'productId', as: 'product' });
 FinalProduct.hasMany(Component, { foreignKey: 'finalProductId', as: 'components' });
 Product.hasMany(Component, { foreignKey: 'productId', as: 'components' });
 
+Product.belongsTo(Currency, { foreignKey: 'currencyId', as: 'currency' });
+FinalProduct.belongsTo(Currency, { foreignKey: 'currencyId', as: 'currency' });
+Currency.hasMany(Product, { foreignKey: 'currencyId', as: 'products' });
+Currency.hasMany(FinalProduct, { foreignKey: 'currencyId', as: 'finalProducts' });
+
+FinalProduct.belongsTo(Client, { foreignKey: 'clientId', as: 'client' });
+Client.hasMany(FinalProduct, { foreignKey: 'clientId', as: 'finalProducts' });
+
 module.exports = {
   sequelize,
   Category,
   Product,
   FinalProduct,
-  Component
+  Component,
+  Currency,
+  Client
 };
 
