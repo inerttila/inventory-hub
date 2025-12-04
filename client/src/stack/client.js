@@ -1,10 +1,13 @@
 import { StackClientApp } from "@stackframe/react";
 import { useNavigate } from "react-router-dom";
 
+const projectId = process.env.REACT_APP_STACK_PROJECT_ID;
+const publishableClientKey = process.env.REACT_APP_STACK_PUBLISHABLE_CLIENT_KEY;
+
 export const stackClientApp = new StackClientApp({
   tokenStore: "cookie",
-  projectId: "8e71168c-02db-460c-8196-4d4fb416edfb",
-  publishableClientKey: "pck_nxck7yw0f5w6qbfe6zv61thj7apd50qdrgevsgzm9dnwg",
+  projectId,
+  publishableClientKey,
   redirectMethod: {
     useNavigate,
   },
