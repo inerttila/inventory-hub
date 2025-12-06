@@ -2,7 +2,7 @@
   "name": "inventory-app-client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:5000",
+  "proxy": "https://invproduct.netlify.app/",
   "dependencies": {
     "@stackframe/react": "^2.8.54",
     "axios": "^1.6.2",
@@ -37,3 +37,4 @@
     ]
   }
 }
+
