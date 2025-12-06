@@ -1,11 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const { Currency } = require("../models");
+const { authenticateUser } = require("../middleware/auth");
+
+// Apply auth middleware to all routes
+router.use(authenticateUser);
 
 // Get all currencies
 router.get("/", async (req, res) => {
   try {
     const currencies = await Currency.findAll({
+      where: { userId: req.userId },
       order: [["createdAt", "DESC"]],
     });
     res.json(currencies);
@@ -17,7 +22,9 @@ router.get("/", async (req, res) => {
 // Get single currency
 router.get("/:id", async (req, res) => {
   try {
-    const currency = await Currency.findByPk(req.params.id);
+    const currency = await Currency.findOne({
+      where: { id: req.params.id, userId: req.userId },
+    });
     if (!currency) {
       return res.status(404).json({ message: "Currency not found" });
     }
@@ -30,7 +37,10 @@ router.get("/:id", async (req, res) => {
 // Create currency
 router.post("/", async (req, res) => {
   try {
-    const currency = await Currency.create(req.body);
+    const currency = await Currency.create({
+      ...req.body,
+      userId: req.userId,
+    });
     res.status(201).json(currency);
   } catch (error) {
     if (error.name === "SequelizeUniqueConstraintError") {
@@ -44,7 +54,9 @@ router.post("/", async (req, res) => {
 // Update currency
 router.put("/:id", async (req, res) => {
   try {
-    const currency = await Currency.findByPk(req.params.id);
+    const currency = await Currency.findOne({
+      where: { id: req.params.id, userId: req.userId },
+    });
     if (!currency) {
       return res.status(404).json({ message: "Currency not found" });
     }
@@ -63,7 +75,9 @@ router.put("/:id", async (req, res) => {
 // Delete currency
 router.delete("/:id", async (req, res) => {
   try {
-    const currency = await Currency.findByPk(req.params.id);
+    const currency = await Currency.findOne({
+      where: { id: req.params.id, userId: req.userId },
+    });
     if (!currency) {
       return res.status(404).json({ message: "Currency not found" });
     }
@@ -75,4 +89,3 @@ router.delete("/:id", async (req, res) => {
 });
 
 module.exports = router;
-

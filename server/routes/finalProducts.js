@@ -8,34 +8,49 @@ const {
   Client,
   sequelize,
 } = require("../models");
+const { authenticateUser } = require("../middleware/auth");
+
+// Apply auth middleware to all routes
+router.use(authenticateUser);
 
 // Get all final products
 router.get("/", async (req, res) => {
   try {
     const finalProducts = await FinalProduct.findAll({
+      where: { userId: req.userId },
       include: [
         {
           model: Currency,
           as: "currency",
           attributes: ["id", "code", "name", "symbol"],
+          where: { userId: req.userId },
+          required: false,
         },
         {
           model: Client,
           as: "client",
           attributes: ["id", "fullName", "number", "email", "address"],
+          where: { userId: req.userId },
+          required: false,
         },
         {
           model: Component,
           as: "components",
+          where: { userId: req.userId },
+          required: false,
           include: [
             {
               model: Product,
               as: "product",
+              where: { userId: req.userId },
+              required: false,
               include: [
                 {
                   model: Currency,
                   as: "currency",
                   attributes: ["id", "code", "name", "symbol"],
+                  where: { userId: req.userId },
+                  required: false,
                 },
               ],
               attributes: [
@@ -61,30 +76,41 @@ router.get("/", async (req, res) => {
 // Get single final product
 router.get("/:id", async (req, res) => {
   try {
-    const finalProduct = await FinalProduct.findByPk(req.params.id, {
+    const finalProduct = await FinalProduct.findOne({
+      where: { id: req.params.id, userId: req.userId },
       include: [
         {
           model: Currency,
           as: "currency",
           attributes: ["id", "code", "name", "symbol"],
+          where: { userId: req.userId },
+          required: false,
         },
         {
           model: Client,
           as: "client",
           attributes: ["id", "fullName", "number", "email", "address"],
+          where: { userId: req.userId },
+          required: false,
         },
         {
           model: Component,
           as: "components",
+          where: { userId: req.userId },
+          required: false,
           include: [
             {
               model: Product,
               as: "product",
+              where: { userId: req.userId },
+              required: false,
               include: [
                 {
                   model: Currency,
                   as: "currency",
                   attributes: ["id", "code", "name", "symbol"],
+                  where: { userId: req.userId },
+                  required: false,
                 },
               ],
               attributes: [
@@ -115,9 +141,15 @@ router.post("/", async (req, res) => {
   try {
     const { components, ...finalProductData } = req.body;
 
-    const finalProduct = await FinalProduct.create(finalProductData, {
-      transaction,
-    });
+    const finalProduct = await FinalProduct.create(
+      {
+        ...finalProductData,
+        userId: req.userId,
+      },
+      {
+        transaction,
+      }
+    );
 
     // Create components with calculations
     if (components && components.length > 0) {
@@ -160,6 +192,7 @@ router.post("/", async (req, res) => {
           total_meters: totalMeters,
           total_price: totalPrice,
           image: comp.image || null,
+          userId: req.userId,
         });
       }
 
@@ -170,29 +203,40 @@ router.post("/", async (req, res) => {
 
     // Fetch with relations
     const productWithRelations = await FinalProduct.findByPk(finalProduct.id, {
+      where: { userId: req.userId },
       include: [
         {
           model: Currency,
           as: "currency",
           attributes: ["id", "code", "name", "symbol"],
+          where: { userId: req.userId },
+          required: false,
         },
         {
           model: Client,
           as: "client",
           attributes: ["id", "fullName", "number", "email", "address"],
+          where: { userId: req.userId },
+          required: false,
         },
         {
           model: Component,
           as: "components",
+          where: { userId: req.userId },
+          required: false,
           include: [
             {
               model: Product,
               as: "product",
+              where: { userId: req.userId },
+              required: false,
               include: [
                 {
                   model: Currency,
                   as: "currency",
                   attributes: ["id", "code", "name", "symbol"],
+                  where: { userId: req.userId },
+                  required: false,
                 },
               ],
               attributes: [
@@ -220,7 +264,10 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
-    const finalProduct = await FinalProduct.findByPk(req.params.id);
+    const finalProduct = await FinalProduct.findOne({
+      where: { id: req.params.id, userId: req.userId },
+      transaction,
+    });
     if (!finalProduct) {
       await transaction.rollback();
       return res.status(404).json({ message: "Final product not found" });
@@ -232,7 +279,7 @@ router.put("/:id", async (req, res) => {
     if (components && components.length > 0) {
       // Delete existing components
       await Component.destroy({
-        where: { finalProductId: finalProduct.id },
+        where: { finalProductId: finalProduct.id, userId: req.userId },
         transaction,
       });
 
@@ -241,7 +288,10 @@ router.put("/:id", async (req, res) => {
 
       for (const comp of components) {
         // Get product to access price_per_square_meter and available square_meters
-        const product = await Product.findByPk(comp.product, { transaction });
+        const product = await Product.findOne({
+          where: { id: comp.product, userId: req.userId },
+          transaction,
+        });
         if (!product) {
           throw new Error(`Product with id ${comp.product} not found`);
         }
@@ -276,6 +326,7 @@ router.put("/:id", async (req, res) => {
           total_meters: totalMeters,
           total_price: totalPrice,
           image: comp.image || null,
+          userId: req.userId,
         });
       }
 
@@ -287,29 +338,40 @@ router.put("/:id", async (req, res) => {
 
     // Fetch with relations
     const updatedProduct = await FinalProduct.findByPk(finalProduct.id, {
+      where: { userId: req.userId },
       include: [
         {
           model: Currency,
           as: "currency",
           attributes: ["id", "code", "name", "symbol"],
+          where: { userId: req.userId },
+          required: false,
         },
         {
           model: Client,
           as: "client",
           attributes: ["id", "fullName", "number", "email", "address"],
+          where: { userId: req.userId },
+          required: false,
         },
         {
           model: Component,
           as: "components",
+          where: { userId: req.userId },
+          required: false,
           include: [
             {
               model: Product,
               as: "product",
+              where: { userId: req.userId },
+              required: false,
               include: [
                 {
                   model: Currency,
                   as: "currency",
                   attributes: ["id", "code", "name", "symbol"],
+                  where: { userId: req.userId },
+                  required: false,
                 },
               ],
               attributes: [
@@ -340,7 +402,9 @@ router.put("/:id", async (req, res) => {
 // Set final product to done
 router.put("/:id/done", async (req, res) => {
   try {
-    const finalProduct = await FinalProduct.findByPk(req.params.id);
+    const finalProduct = await FinalProduct.findOne({
+      where: { id: req.params.id, userId: req.userId },
+    });
     if (!finalProduct) {
       return res.status(404).json({ message: "Final product not found" });
     }
@@ -348,29 +412,40 @@ router.put("/:id/done", async (req, res) => {
     await finalProduct.update({ status: "done" });
 
     const updatedProduct = await FinalProduct.findByPk(finalProduct.id, {
+      where: { userId: req.userId },
       include: [
         {
           model: Currency,
           as: "currency",
           attributes: ["id", "code", "name", "symbol"],
+          where: { userId: req.userId },
+          required: false,
         },
         {
           model: Client,
           as: "client",
           attributes: ["id", "fullName", "number", "email", "address"],
+          where: { userId: req.userId },
+          required: false,
         },
         {
           model: Component,
           as: "components",
+          where: { userId: req.userId },
+          required: false,
           include: [
             {
               model: Product,
               as: "product",
+              where: { userId: req.userId },
+              required: false,
               include: [
                 {
                   model: Currency,
                   as: "currency",
                   attributes: ["id", "code", "name", "symbol"],
+                  where: { userId: req.userId },
+                  required: false,
                 },
               ],
               attributes: [
@@ -396,7 +471,9 @@ router.put("/:id/done", async (req, res) => {
 // Reset final product to pending
 router.put("/:id/reset", async (req, res) => {
   try {
-    const finalProduct = await FinalProduct.findByPk(req.params.id);
+    const finalProduct = await FinalProduct.findOne({
+      where: { id: req.params.id, userId: req.userId },
+    });
     if (!finalProduct) {
       return res.status(404).json({ message: "Final product not found" });
     }
@@ -404,29 +481,40 @@ router.put("/:id/reset", async (req, res) => {
     await finalProduct.update({ status: "pending" });
 
     const updatedProduct = await FinalProduct.findByPk(finalProduct.id, {
+      where: { userId: req.userId },
       include: [
         {
           model: Currency,
           as: "currency",
           attributes: ["id", "code", "name", "symbol"],
+          where: { userId: req.userId },
+          required: false,
         },
         {
           model: Client,
           as: "client",
           attributes: ["id", "fullName", "number", "email", "address"],
+          where: { userId: req.userId },
+          required: false,
         },
         {
           model: Component,
           as: "components",
+          where: { userId: req.userId },
+          required: false,
           include: [
             {
               model: Product,
               as: "product",
+              where: { userId: req.userId },
+              required: false,
               include: [
                 {
                   model: Currency,
                   as: "currency",
                   attributes: ["id", "code", "name", "symbol"],
+                  where: { userId: req.userId },
+                  required: false,
                 },
               ],
               attributes: [
@@ -453,13 +541,16 @@ router.put("/:id/reset", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
-    const finalProduct = await FinalProduct.findByPk(req.params.id);
+    const finalProduct = await FinalProduct.findOne({
+      where: { id: req.params.id, userId: req.userId },
+      transaction,
+    });
     if (!finalProduct) {
       await transaction.rollback();
       return res.status(404).json({ message: "Final product not found" });
     }
     await Component.destroy({
-      where: { finalProductId: finalProduct.id },
+      where: { finalProductId: finalProduct.id, userId: req.userId },
       transaction,
     });
     await finalProduct.destroy({ transaction });
