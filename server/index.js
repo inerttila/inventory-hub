@@ -24,10 +24,14 @@ if (fs.existsSync(buildPath)) {
   app.use(express.static(buildPath));
 }
 
-// PostgreSQL connection
+// PostgreSQL connection and migration
 sequelize.authenticate()
   .then(() => {
     console.log('PostgreSQL connected successfully');
+    // Run migration to add userId columns to existing tables
+    return require('./migrations/add-userId-columns').migrateUserIdColumns();
+  })
+  .then(() => {
     // Sync database (creates tables if they don't exist, alters if schema changed)
     return sequelize.sync({ alter: true });
   })
