@@ -161,6 +161,44 @@
   flex-wrap: wrap;
 }
 
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  background: #adb5bd;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #9ca3af;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+}
+
 .btn-success {
   background: #28a745;
   color: white;
@@ -168,6 +206,11 @@
 
 .btn-success:hover {
   background: #218838;
+}
+
+.btn-small {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.75rem;
 }
 
 .no-currencies {

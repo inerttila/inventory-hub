@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import apiClient from '../utils/axiosConfig';
 import './Categories.css';
 import { useNotification } from '../context/NotificationContext';
 import ConfirmDialog from './ConfirmDialog';
@@ -21,7 +21,7 @@ const Categories = () => {
 
   const fetchCategories = useCallback(async () => {
     try {
-      const res = await axios.get('/api/categories');
+      const res = await apiClient.get('/api/categories');
       setCategories(res.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -37,9 +37,9 @@ const Categories = () => {
     e.preventDefault();
     try {
       if (editingCategory) {
-        await axios.put(`/api/categories/${editingCategory.id}`, formData);
+        await apiClient.put(`/api/categories/${editingCategory.id}`, formData);
       } else {
-        await axios.post('/api/categories', formData);
+        await apiClient.post('/api/categories', formData);
       }
 
       setShowModal(false);
@@ -65,7 +65,7 @@ const Categories = () => {
     if (!window.confirm('Are you sure you want to delete this category?')) return;
     
     try {
-      await axios.delete(`/api/categories/${id}`);
+      await apiClient.delete(`/api/categories/${id}`);
       fetchCategories();
       showSuccess('Category deleted successfully!');
     } catch (error) {

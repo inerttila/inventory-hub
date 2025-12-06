@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import apiClient from '../utils/axiosConfig';
 import './Products.css';
 import { useNotification } from '../context/NotificationContext';
 import { useCurrency } from '../context/CurrencyContext';
@@ -28,7 +28,7 @@ const Products = () => {
 
   const fetchProducts = useCallback(async () => {
     try {
-      const res = await axios.get('/api/products');
+      const res = await apiClient.get('/api/products');
       setProducts(res.data);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -53,9 +53,9 @@ const Products = () => {
       delete data.currency;
 
       if (editingProduct) {
-        await axios.put(`/api/products/${editingProduct.id}`, data);
+        await apiClient.put(`/api/products/${editingProduct.id}`, data);
       } else {
-        await axios.post('/api/products', data);
+        await apiClient.post('/api/products', data);
       }
 
       setShowModal(false);
@@ -87,7 +87,7 @@ const Products = () => {
       message: "Are you sure you want to delete this product?",
       onConfirm: async () => {
         try {
-          await axios.delete(`/api/products/${id}`);
+          await apiClient.delete(`/api/products/${id}`);
           fetchProducts();
           showSuccess("Product deleted successfully!");
           setConfirmDialog({ isOpen: false, message: "", onConfirm: null });

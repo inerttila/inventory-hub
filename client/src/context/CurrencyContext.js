@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import apiClient from "../utils/axiosConfig";
+import { useUserContext } from "./UserContext";
 
 const CurrencyContext = createContext();
 
@@ -12,19 +13,26 @@ export const useCurrency = () => {
 };
 
 export const CurrencyProvider = ({ children }) => {
+  const { userId } = useUserContext() || {};
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchCurrencies = useCallback(async () => {
+    // Only fetch if user is logged in
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+
     try {
-      const res = await axios.get("/api/currencies");
+      const res = await apiClient.get("/api/currencies");
       setCurrencies(res.data);
     } catch (error) {
       console.error("Error fetching currencies:", error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     fetchCurrencies();

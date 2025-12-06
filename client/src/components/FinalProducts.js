@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import apiClient from "../utils/axiosConfig";
 import * as XLSX from "xlsx-js-style";
 import "./FinalProducts.css";
 import { useNotification } from "../context/NotificationContext";
@@ -35,7 +35,7 @@ const FinalProducts = () => {
 
   const fetchFinalProducts = useCallback(async () => {
     try {
-      const res = await axios.get("/api/final-products");
+      const res = await apiClient.get("/api/final-products");
       setFinalProducts(res.data);
     } catch (error) {
       console.error("Error fetching final products:", error);
@@ -45,7 +45,7 @@ const FinalProducts = () => {
 
   const fetchClients = useCallback(async () => {
     try {
-      const res = await axios.get("/api/clients");
+      const res = await apiClient.get("/api/clients");
       setClients(res.data);
     } catch (error) {
       console.error("Error fetching clients:", error);
@@ -55,7 +55,7 @@ const FinalProducts = () => {
 
   const fetchProducts = useCallback(async () => {
     try {
-      const res = await axios.get("/api/products");
+      const res = await apiClient.get("/api/products");
       setProducts(res.data);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -152,7 +152,7 @@ const FinalProducts = () => {
       const uploadFormData = new FormData();
       uploadFormData.append("image", file);
 
-      const response = await axios.post(
+      const response = await apiClient.post(
         "/api/upload/component-image",
         uploadFormData,
         {
@@ -245,9 +245,9 @@ const FinalProducts = () => {
       delete data.client;
 
       if (editingProduct) {
-        await axios.put(`/api/final-products/${editingProduct.id}`, data);
+        await apiClient.put(`/api/final-products/${editingProduct.id}`, data);
       } else {
-        await axios.post("/api/final-products", data);
+        await apiClient.post("/api/final-products", data);
       }
 
       setShowModal(false);
@@ -293,7 +293,7 @@ const FinalProducts = () => {
       message: "Are you sure you want to delete this final product?",
       onConfirm: async () => {
         try {
-          await axios.delete(`/api/final-products/${id}`);
+          await apiClient.delete(`/api/final-products/${id}`);
           fetchFinalProducts();
           showSuccess("Final product deleted successfully!");
           setConfirmDialog({ isOpen: false, message: "", onConfirm: null });
@@ -307,7 +307,7 @@ const FinalProducts = () => {
 
   const handleSetToDone = async (id) => {
     try {
-      await axios.put(`/api/final-products/${id}/done`);
+      await apiClient.put(`/api/final-products/${id}/done`);
       fetchFinalProducts();
       showSuccess("Final product marked as done!");
     } catch (error) {
@@ -317,7 +317,7 @@ const FinalProducts = () => {
 
   const handleReset = async (id) => {
     try {
-      await axios.put(`/api/final-products/${id}/reset`);
+      await apiClient.put(`/api/final-products/${id}/reset`);
       fetchFinalProducts();
       showSuccess("Final product reset to pending!");
     } catch (error) {
@@ -1322,7 +1322,7 @@ const FinalProducts = () => {
                     {editingProduct.status !== "done" ? (
                       <button
                         type="button"
-                        className="btn btn-success"
+                        className="btn btn-success btn-small"
                         onClick={async () => {
                           try {
                             await handleSetToDone(editingProduct.id);
@@ -1339,7 +1339,7 @@ const FinalProducts = () => {
                     ) : (
                       <button
                         type="button"
-                        className="btn btn-secondary"
+                        className="btn btn-secondary btn-small"
                         onClick={async () => {
                           try {
                             await handleReset(editingProduct.id);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import apiClient from "../utils/axiosConfig";
 import "./Settings.css";
 import { useNotification } from "../context/NotificationContext";
 import { useCurrency } from "../context/CurrencyContext";
@@ -35,7 +35,7 @@ const Settings = ({ onClose }) => {
 
   const fetchCurrencies = useCallback(async () => {
     try {
-      const res = await axios.get("/api/currencies");
+      const res = await apiClient.get("/api/currencies");
       setCurrencies(res.data);
     } catch (error) {
       console.error("Error fetching currencies:", error);
@@ -45,7 +45,7 @@ const Settings = ({ onClose }) => {
 
   const fetchClients = useCallback(async () => {
     try {
-      const res = await axios.get("/api/clients");
+      const res = await apiClient.get("/api/clients");
       setClients(res.data);
     } catch (error) {
       console.error("Error fetching clients:", error);
@@ -62,10 +62,10 @@ const Settings = ({ onClose }) => {
     e.preventDefault();
     try {
       if (editingCurrency) {
-        await axios.put(`/api/currencies/${editingCurrency.id}`, formData);
+        await apiClient.put(`/api/currencies/${editingCurrency.id}`, formData);
         showSuccess("Currency updated successfully!");
       } else {
-        await axios.post("/api/currencies", formData);
+        await apiClient.post("/api/currencies", formData);
         showSuccess("Currency created successfully!");
       }
       setShowModal(false);
@@ -88,14 +88,13 @@ const Settings = ({ onClose }) => {
     setShowModal(true);
   };
 
-
   const handleDelete = (id) => {
     setConfirmDialog({
       isOpen: true,
       message: "Are you sure you want to delete this currency?",
       onConfirm: async () => {
         try {
-          await axios.delete(`/api/currencies/${id}`);
+          await apiClient.delete(`/api/currencies/${id}`);
           showSuccess("Currency deleted successfully!");
           fetchCurrencies();
           setConfirmDialog({ isOpen: false, message: "", onConfirm: null });
@@ -128,10 +127,10 @@ const Settings = ({ onClose }) => {
     e.preventDefault();
     try {
       if (editingClient) {
-        await axios.put(`/api/clients/${editingClient.id}`, clientFormData);
+        await apiClient.put(`/api/clients/${editingClient.id}`, clientFormData);
         showSuccess("Client updated successfully!");
       } else {
-        await axios.post("/api/clients", clientFormData);
+        await apiClient.post("/api/clients", clientFormData);
         showSuccess("Client created successfully!");
       }
       setShowClientModal(false);
@@ -160,7 +159,7 @@ const Settings = ({ onClose }) => {
       message: "Are you sure you want to delete this client?",
       onConfirm: async () => {
         try {
-          await axios.delete(`/api/clients/${id}`);
+          await apiClient.delete(`/api/clients/${id}`);
           showSuccess("Client deleted successfully!");
           fetchClients();
           setConfirmDialog({ isOpen: false, message: "", onConfirm: null });
@@ -183,7 +182,7 @@ const Settings = ({ onClose }) => {
         </div>
 
         <div className="settings-section">
-          <div 
+          <div
             className="section-header clickable"
             onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
           >
@@ -200,7 +199,7 @@ const Settings = ({ onClose }) => {
               >
                 + Add Currency
               </button>
-              <span className={`section-arrow ${isCurrencyOpen ? 'open' : ''}`}>
+              <span className={`section-arrow ${isCurrencyOpen ? "open" : ""}`}>
                 ▼
               </span>
             </div>
@@ -208,40 +207,41 @@ const Settings = ({ onClose }) => {
 
           {isCurrencyOpen && (
             <div className="currencies-list">
-            {currencies.length === 0 ? (
-              <p className="no-currencies">No currencies added yet.</p>
-            ) : (
-              currencies.map((currency) => (
-                <div
-                  key={currency.id}
-                  className="currency-item"
-                >
+              {currencies.length === 0 ? (
+                <p className="no-currencies">No currencies added yet.</p>
+              ) : (
+                currencies.map((currency) => (
+                  <div key={currency.id} className="currency-item">
                     <div className="currency-info">
                       <div className="currency-main">
-                        <span className="currency-symbol">{currency.symbol}</span>
+                        <span className="currency-symbol">
+                          {currency.symbol}
+                        </span>
                         <div>
                           <strong>{currency.name}</strong>
-                          <span className="currency-code">({currency.code})</span>
+                          <span className="currency-code">
+                            ({currency.code})
+                          </span>
                         </div>
                       </div>
                     </div>
-                  <div className="currency-actions">
-                    <button
-                      className="btn btn-secondary btn-small"
-                      onClick={() => handleEdit(currency)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-danger btn-small"
-                      onClick={() => handleDelete(currency.id)}
-                    >
-                      Delete
-                    </button>
+                    <div className="currency-actions">
+                      <button
+                        className="btn btn-secondary btn-small"
+                        onClick={() => handleEdit(currency)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-danger btn-small"
+                        onClick={() => handleDelete(currency.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
             </div>
           )}
         </div>
@@ -301,7 +301,6 @@ const Settings = ({ onClose }) => {
                   />
                 </div>
 
-
                 <div className="form-actions">
                   <button
                     type="button"
@@ -325,7 +324,7 @@ const Settings = ({ onClose }) => {
 
         {/* Clients Section */}
         <div className="settings-section">
-          <div 
+          <div
             className="section-header clickable"
             onClick={() => setIsClientsOpen(!isClientsOpen)}
           >
@@ -342,7 +341,7 @@ const Settings = ({ onClose }) => {
               >
                 + Add Client
               </button>
-              <span className={`section-arrow ${isClientsOpen ? 'open' : ''}`}>
+              <span className={`section-arrow ${isClientsOpen ? "open" : ""}`}>
                 ▼
               </span>
             </div>
@@ -360,7 +359,10 @@ const Settings = ({ onClose }) => {
                         <div>
                           <strong>{client.fullName}</strong>
                           {client.number && (
-                            <span className="currency-code"> ({client.number})</span>
+                            <span className="currency-code">
+                              {" "}
+                              ({client.number})
+                            </span>
                           )}
                         </div>
                         {client.email && (
@@ -369,7 +371,13 @@ const Settings = ({ onClose }) => {
                           </div>
                         )}
                         {client.address && (
-                          <div style={{ fontSize: "0.75rem", color: "#999", marginTop: "0.25rem" }}>
+                          <div
+                            style={{
+                              fontSize: "0.75rem",
+                              color: "#999",
+                              marginTop: "0.25rem",
+                            }}
+                          >
                             {client.address}
                           </div>
                         )}
@@ -398,11 +406,14 @@ const Settings = ({ onClose }) => {
 
         {/* Client Modal */}
         {showClientModal && (
-          <div className="modal-overlay" onClick={() => {
-            setShowClientModal(false);
-            setEditingClient(null);
-            resetClientForm();
-          }}>
+          <div
+            className="modal-overlay"
+            onClick={() => {
+              setShowClientModal(false);
+              setEditingClient(null);
+              resetClientForm();
+            }}
+          >
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <h3>{editingClient ? "Edit Client" : "Add New Client"}</h3>
               <form onSubmit={handleClientSubmit}>
@@ -412,7 +423,10 @@ const Settings = ({ onClose }) => {
                     type="text"
                     value={clientFormData.fullName}
                     onChange={(e) =>
-                      setClientFormData({ ...clientFormData, fullName: e.target.value })
+                      setClientFormData({
+                        ...clientFormData,
+                        fullName: e.target.value,
+                      })
                     }
                     required
                   />
@@ -424,7 +438,10 @@ const Settings = ({ onClose }) => {
                     type="text"
                     value={clientFormData.number}
                     onChange={(e) =>
-                      setClientFormData({ ...clientFormData, number: e.target.value })
+                      setClientFormData({
+                        ...clientFormData,
+                        number: e.target.value,
+                      })
                     }
                   />
                 </div>
@@ -435,7 +452,10 @@ const Settings = ({ onClose }) => {
                     type="email"
                     value={clientFormData.email}
                     onChange={(e) =>
-                      setClientFormData({ ...clientFormData, email: e.target.value })
+                      setClientFormData({
+                        ...clientFormData,
+                        email: e.target.value,
+                      })
                     }
                   />
                 </div>
@@ -445,7 +465,10 @@ const Settings = ({ onClose }) => {
                   <textarea
                     value={clientFormData.address}
                     onChange={(e) =>
-                      setClientFormData({ ...clientFormData, address: e.target.value })
+                      setClientFormData({
+                        ...clientFormData,
+                        address: e.target.value,
+                      })
                     }
                     rows="3"
                   />
@@ -477,7 +500,9 @@ const Settings = ({ onClose }) => {
           isOpen={confirmDialog.isOpen}
           message={confirmDialog.message}
           onConfirm={confirmDialog.onConfirm}
-          onCancel={() => setConfirmDialog({ isOpen: false, message: "", onConfirm: null })}
+          onCancel={() =>
+            setConfirmDialog({ isOpen: false, message: "", onConfirm: null })
+          }
         />
       </div>
     </div>

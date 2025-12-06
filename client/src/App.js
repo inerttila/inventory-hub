@@ -3,8 +3,9 @@ import {
   StackProvider,
   StackTheme,
   useUser,
+  UserButton,
 } from "@stackframe/react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Link,
   Route,
@@ -20,6 +21,7 @@ import Products from "./components/Products";
 import Settings from "./components/Settings";
 import { CurrencyProvider } from "./context/CurrencyContext";
 import { NotificationProvider } from "./context/NotificationContext";
+import { UserProvider } from "./context/UserContext";
 import { stackClientApp } from "./stack/client";
 
 function HandlerRoutes() {
@@ -32,18 +34,6 @@ function HandlerRoutes() {
 
 function Navbar({ onSettingsClick }) {
   const user = useUser();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      if (user) {
-        await user.signOut();
-        navigate("/handler/sign-in");
-      }
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
 
   return (
     <nav className="navbar">
@@ -75,25 +65,22 @@ function Navbar({ onSettingsClick }) {
           </div>
           {user && (
             <div className="user-profile-section">
-              <div className="user-info">
-                {user.profileImageUrl && (
-                  <img
-                    src={user.profileImageUrl}
-                    alt="Profile"
-                    className="user-avatar"
-                  />
-                )}
-                <span className="user-name">
-                  {user.displayName || user.primaryEmail || "User"}
-                </span>
-              </div>
-              <button
-                className="logout-btn"
-                onClick={handleLogout}
-                title="Logout"
-              >
-                Logout
-              </button>
+              <UserButton
+                showUserInfo={true}
+                afterSignOutUrl="/handler/sign-in"
+                afterSignOut={() => {
+                  // Clear the global user ID when user signs out
+                  window.__stackUserId = null;
+                }}
+                appearance={{
+                  elements: {
+                    userButtonAvatarBox: {
+                      width: "40px",
+                      height: "40px",
+                    },
+                  },
+                }}
+              />
             </div>
           )}
           <button
@@ -112,7 +99,18 @@ function Navbar({ onSettingsClick }) {
 function AppContent() {
   const [showSettings, setShowSettings] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const user = useUser();
   const isAuthPage = location.pathname.startsWith("/handler");
+
+  // Redirect to sign-in if user logs out while on protected pages
+  useEffect(() => {
+    if (!isAuthPage && !user) {
+      // Clear user ID when user becomes null
+      window.__stackUserId = null;
+      navigate("/handler/sign-in", { replace: true });
+    }
+  }, [user, isAuthPage, navigate]);
 
   if (isAuthPage) {
     return (
@@ -120,6 +118,11 @@ function AppContent() {
         <Route path="/handler/*" element={<HandlerRoutes />} />
       </Routes>
     );
+  }
+
+  // Don't render protected content if user is not logged in
+  if (!user) {
+    return null; // Will redirect via useEffect
   }
 
   return (
@@ -154,15 +157,22 @@ function AppContent() {
 function App() {
   return (
     <NotificationProvider>
-      <CurrencyProvider>
-        <Router>
-          <StackProvider app={stackClientApp}>
-            <StackTheme>
-              <AppContent />
-            </StackTheme>
-          </StackProvider>
-        </Router>
-      </CurrencyProvider>
+      <Router
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
+        <StackProvider app={stackClientApp}>
+          <StackTheme>
+            <UserProvider>
+              <CurrencyProvider>
+                <AppContent />
+              </CurrencyProvider>
+            </UserProvider>
+          </StackTheme>
+        </StackProvider>
+      </Router>
     </NotificationProvider>
   );
 }

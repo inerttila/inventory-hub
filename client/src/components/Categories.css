@@ -38,12 +38,41 @@
   gap: 0.5rem;
 }
 
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  background: #adb5bd;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #9ca3af;
+}
+
 .btn-icon {
   background: none;
   border: none;
-  font-size: 1.05rem;
+  font-size: 0.9rem;
   cursor: pointer;
-  padding: 0.25rem;
+  padding: 0.2rem;
   transition: transform 0.2s;
 }
 
