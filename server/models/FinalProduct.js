@@ -19,7 +19,6 @@ module.exports = (sequelize) => {
       code: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
         validate: {
           notEmpty: true,
         },
@@ -58,10 +57,23 @@ module.exports = (sequelize) => {
         allowNull: false,
         defaultValue: true,
       },
+      userId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+        },
+      },
     },
     {
       tableName: "final_products",
       timestamps: true,
+      indexes: [
+        {
+          unique: true,
+          fields: ["code", "userId"],
+        },
+      ],
     }
   );
 

@@ -12,7 +12,6 @@ module.exports = (sequelize) => {
       code: {
         type: DataTypes.STRING(3),
         allowNull: false,
-        unique: true,
         validate: {
           notEmpty: true,
           len: [3, 3],
@@ -32,13 +31,25 @@ module.exports = (sequelize) => {
           notEmpty: true,
         },
       },
+      userId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+        },
+      },
     },
     {
       tableName: "currencies",
       timestamps: true,
+      indexes: [
+        {
+          unique: true,
+          fields: ["code", "userId"],
+        },
+      ],
     }
   );
 
   return Currency;
 };
-
