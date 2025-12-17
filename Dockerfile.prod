@@ -1,0 +1,47 @@
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Required for node-gyp
+RUN apk add --no-cache python3 make g++
+
+# Copy package files
+COPY package.json ./
+COPY package-lock.json* ./
+
+# Install all dependencies (including dev for building)
+# Try npm ci first, fallback to npm install if it fails
+RUN npm ci || npm install
+
+# Copy backend source
+COPY server ./server
+
+# Production stage
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Required for node-gyp (for potential native modules)
+RUN apk add --no-cache python3 make g++
+
+# Copy package files
+COPY package.json ./
+COPY package-lock.json* ./
+
+# Install only production dependencies
+# Try npm ci first, fallback to npm install if it fails
+RUN npm ci --only=production || npm install --only=production
+
+# Copy backend source from builder
+COPY --from=builder /app/server ./server
+
+# Create uploads dir
+RUN mkdir -p uploads
+
+# Create directory for client build (will be copied from frontend build)
+RUN mkdir -p client/build
+
+EXPOSE 5000
+
+# Use production start command
+CMD ["npm", "start"]
