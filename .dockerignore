@@ -1,0 +1,41 @@
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Git
+.git
+.gitignore
+
+# Environment files
+.env
+.env.*
+client/.env
+client/.env.*
+server/.env
+
+# Build outputs
+dist
+build
+client/build
+
+# IDE / OS
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Docker (keep production files)
+Dockerfile
+docker-compose.yml
+!Dockerfile.prod
+!docker-compose.prod.yml
+
+# Tests & docs
+coverage
+*.md
+
+# Logs
+logs
+*.log
