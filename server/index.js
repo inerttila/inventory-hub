@@ -8,12 +8,7 @@ const { sequelize } = require('./models');
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-Id'],
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 
 // Serve uploaded images
@@ -69,12 +64,6 @@ app.use('/api/final-products', require('./routes/finalProducts'));
 app.use('/api/currencies', require('./routes/currencies'));
 app.use('/api/clients', require('./routes/clients'));
 app.use('/api/upload', require('./routes/upload'));
-
-// Error handler for unhandled routes
-app.use('/api/*', (req, res) => {
-  console.error(`Unhandled ${req.method} request to ${req.path}`);
-  res.status(404).json({ message: 'API route not found' });
-});
 
 // Serve React app (only if build exists)
 // Skip API routes - they're handled above
