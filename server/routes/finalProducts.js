@@ -260,6 +260,144 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Set final product to done (MUST come before /:id route)
+router.put("/:id/done", async (req, res) => {
+  try {
+    const finalProduct = await FinalProduct.findOne({
+      where: { id: req.params.id, userId: req.userId },
+    });
+    if (!finalProduct) {
+      return res.status(404).json({ message: "Final product not found" });
+    }
+
+    await finalProduct.update({ status: "done" });
+
+    const updatedProduct = await FinalProduct.findByPk(finalProduct.id, {
+      where: { userId: req.userId },
+      include: [
+        {
+          model: Currency,
+          as: "currency",
+          attributes: ["id", "code", "name", "symbol"],
+          where: { userId: req.userId },
+          required: false,
+        },
+        {
+          model: Client,
+          as: "client",
+          attributes: ["id", "fullName", "number", "email", "address"],
+          where: { userId: req.userId },
+          required: false,
+        },
+        {
+          model: Component,
+          as: "components",
+          where: { userId: req.userId },
+          required: false,
+          include: [
+            {
+              model: Product,
+              as: "product",
+              where: { userId: req.userId },
+              required: false,
+              include: [
+                {
+                  model: Currency,
+                  as: "currency",
+                  attributes: ["id", "code", "name", "symbol"],
+                  where: { userId: req.userId },
+                  required: false,
+                },
+              ],
+              attributes: [
+                "id",
+                "name",
+                "barcode",
+                "price_per_square_meter",
+                "square_meters",
+                "description",
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    res.json(updatedProduct);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Reset final product to pending (MUST come before /:id route)
+router.put("/:id/reset", async (req, res) => {
+  try {
+    const finalProduct = await FinalProduct.findOne({
+      where: { id: req.params.id, userId: req.userId },
+    });
+    if (!finalProduct) {
+      return res.status(404).json({ message: "Final product not found" });
+    }
+
+    await finalProduct.update({ status: "pending" });
+
+    const updatedProduct = await FinalProduct.findByPk(finalProduct.id, {
+      where: { userId: req.userId },
+      include: [
+        {
+          model: Currency,
+          as: "currency",
+          attributes: ["id", "code", "name", "symbol"],
+          where: { userId: req.userId },
+          required: false,
+        },
+        {
+          model: Client,
+          as: "client",
+          attributes: ["id", "fullName", "number", "email", "address"],
+          where: { userId: req.userId },
+          required: false,
+        },
+        {
+          model: Component,
+          as: "components",
+          where: { userId: req.userId },
+          required: false,
+          include: [
+            {
+              model: Product,
+              as: "product",
+              where: { userId: req.userId },
+              required: false,
+              include: [
+                {
+                  model: Currency,
+                  as: "currency",
+                  attributes: ["id", "code", "name", "symbol"],
+                  where: { userId: req.userId },
+                  required: false,
+                },
+              ],
+              attributes: [
+                "id",
+                "name",
+                "barcode",
+                "price_per_square_meter",
+                "square_meters",
+                "description",
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    res.json(updatedProduct);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Update final product
 router.put("/:id", async (req, res) => {
   const transaction = await sequelize.transaction();
@@ -396,144 +534,6 @@ router.put("/:id", async (req, res) => {
     } else {
       res.status(400).json({ message: error.message });
     }
-  }
-});
-
-// Set final product to done
-router.put("/:id/done", async (req, res) => {
-  try {
-    const finalProduct = await FinalProduct.findOne({
-      where: { id: req.params.id, userId: req.userId },
-    });
-    if (!finalProduct) {
-      return res.status(404).json({ message: "Final product not found" });
-    }
-
-    await finalProduct.update({ status: "done" });
-
-    const updatedProduct = await FinalProduct.findByPk(finalProduct.id, {
-      where: { userId: req.userId },
-      include: [
-        {
-          model: Currency,
-          as: "currency",
-          attributes: ["id", "code", "name", "symbol"],
-          where: { userId: req.userId },
-          required: false,
-        },
-        {
-          model: Client,
-          as: "client",
-          attributes: ["id", "fullName", "number", "email", "address"],
-          where: { userId: req.userId },
-          required: false,
-        },
-        {
-          model: Component,
-          as: "components",
-          where: { userId: req.userId },
-          required: false,
-          include: [
-            {
-              model: Product,
-              as: "product",
-              where: { userId: req.userId },
-              required: false,
-              include: [
-                {
-                  model: Currency,
-                  as: "currency",
-                  attributes: ["id", "code", "name", "symbol"],
-                  where: { userId: req.userId },
-                  required: false,
-                },
-              ],
-              attributes: [
-                "id",
-                "name",
-                "barcode",
-                "price_per_square_meter",
-                "square_meters",
-                "description",
-              ],
-            },
-          ],
-        },
-      ],
-    });
-
-    res.json(updatedProduct);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Reset final product to pending
-router.put("/:id/reset", async (req, res) => {
-  try {
-    const finalProduct = await FinalProduct.findOne({
-      where: { id: req.params.id, userId: req.userId },
-    });
-    if (!finalProduct) {
-      return res.status(404).json({ message: "Final product not found" });
-    }
-
-    await finalProduct.update({ status: "pending" });
-
-    const updatedProduct = await FinalProduct.findByPk(finalProduct.id, {
-      where: { userId: req.userId },
-      include: [
-        {
-          model: Currency,
-          as: "currency",
-          attributes: ["id", "code", "name", "symbol"],
-          where: { userId: req.userId },
-          required: false,
-        },
-        {
-          model: Client,
-          as: "client",
-          attributes: ["id", "fullName", "number", "email", "address"],
-          where: { userId: req.userId },
-          required: false,
-        },
-        {
-          model: Component,
-          as: "components",
-          where: { userId: req.userId },
-          required: false,
-          include: [
-            {
-              model: Product,
-              as: "product",
-              where: { userId: req.userId },
-              required: false,
-              include: [
-                {
-                  model: Currency,
-                  as: "currency",
-                  attributes: ["id", "code", "name", "symbol"],
-                  where: { userId: req.userId },
-                  required: false,
-                },
-              ],
-              attributes: [
-                "id",
-                "name",
-                "barcode",
-                "price_per_square_meter",
-                "square_meters",
-                "description",
-              ],
-            },
-          ],
-        },
-      ],
-    });
-
-    res.json(updatedProduct);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
 });
 
