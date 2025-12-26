@@ -32,6 +32,7 @@ const FinalProducts = () => {
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedCards, setExpandedCards] = useState({});
+  const [uploadingImages, setUploadingImages] = useState({}); // { index: progress }
 
   const fetchFinalProducts = useCallback(async () => {
     try {
@@ -148,6 +149,9 @@ const FinalProducts = () => {
   const handleImageUpload = async (index, file) => {
     if (!file) return;
 
+    // Set initial upload progress
+    setUploadingImages((prev) => ({ ...prev, [index]: 0 }));
+
     try {
       const uploadFormData = new FormData();
       uploadFormData.append("image", file);
@@ -159,14 +163,34 @@ const FinalProducts = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setUploadingImages((prev) => ({ ...prev, [index]: percentCompleted }));
+          },
         }
       );
 
       const updatedComponents = [...formData.components];
       updatedComponents[index].image = response.data.imagePath;
       setFormData({ ...formData, components: updatedComponents });
+      
+      // Clear upload progress
+      setUploadingImages((prev) => {
+        const newState = { ...prev };
+        delete newState[index];
+        return newState;
+      });
+      
       showSuccess("Image uploaded successfully!");
     } catch (error) {
+      // Clear upload progress on error
+      setUploadingImages((prev) => {
+        const newState = { ...prev };
+        delete newState[index];
+        return newState;
+      });
       showError(error.response?.data?.message || "Error uploading image");
     }
   };
@@ -1180,6 +1204,7 @@ const FinalProducts = () => {
                                 accept="image/*"
                                 id={`image-upload-${index}`}
                                 style={{ display: "none" }}
+                                disabled={uploadingImages[index] !== undefined}
                                 onChange={(e) => {
                                   const file = e.target.files[0];
                                   if (file) {
@@ -1187,13 +1212,32 @@ const FinalProducts = () => {
                                   }
                                 }}
                               />
-                              <label
-                                htmlFor={`image-upload-${index}`}
-                                className="image-upload-btn"
-                                title="Upload image"
-                              >
-                                📷
-                              </label>
+                              <div className="image-upload-wrapper">
+                                <label
+                                  htmlFor={`image-upload-${index}`}
+                                  className={`image-upload-btn ${uploadingImages[index] !== undefined ? 'uploading' : ''}`}
+                                  title="Upload image"
+                                  style={{ 
+                                    opacity: uploadingImages[index] !== undefined ? 0.6 : 1,
+                                    cursor: uploadingImages[index] !== undefined ? 'not-allowed' : 'pointer'
+                                  }}
+                                >
+                                  {uploadingImages[index] !== undefined ? '⏳' : '📷'}
+                                </label>
+                                {uploadingImages[index] !== undefined && (
+                                  <div className="upload-progress-container">
+                                    <div className="upload-progress-bar">
+                                      <div 
+                                        className="upload-progress-fill"
+                                        style={{ width: `${uploadingImages[index]}%` }}
+                                      ></div>
+                                    </div>
+                                    <span className="upload-progress-text">
+                                      {uploadingImages[index]}%
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
                               {component.image && (
                                 <div className="image-preview-container">
                                   <img
