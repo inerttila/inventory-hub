@@ -84,8 +84,12 @@ router.put("/:id", async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    await product.update(req.body);
-    const updatedProduct = await Product.findByPk(product.id, {
+    // Remove userId from update data if present (should not be updated)
+    const { userId, ...updateData } = req.body;
+    
+    await product.update(updateData);
+    const updatedProduct = await Product.findOne({
+      where: { id: product.id, userId: req.userId },
       include: [
         {
           model: Currency,
