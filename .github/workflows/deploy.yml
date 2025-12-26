@@ -13,12 +13,12 @@ jobs:
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
+          host: ${{ vars.SSH_HOST }}
+          username: ${{ vars.SSH_USER }}
+          key: ${{ vars.SSH_PRIVATE_KEY }}
+          port: ${{ vars.SSH_PORT || 22 }}
           script: |
-            cd ${{ secrets.PROJECT_PATH || '/root/inventory-hub' }}
+            cd ${{ vars.PROJECT_PATH || '/root/inventory-hub' }}
             git pull origin main
             docker-compose -f docker-compose.prod.yml down
             docker-compose -f docker-compose.prod.yml --env-file .env.prod up --build -d
