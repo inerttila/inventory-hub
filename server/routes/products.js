@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { Product, Currency } = require("../models");
+const { Product, Currency, Component } = require("../models");
 const { authenticateUser } = require("../middleware/auth");
 
 // Apply auth middleware to all routes
@@ -117,6 +117,18 @@ router.delete("/:id", async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
+
+    // Check if product is being used in any components (final products)
+    const componentsUsingProduct = await Component.count({
+      where: { productId: req.params.id, userId: req.userId },
+    });
+
+    if (componentsUsingProduct > 0) {
+      return res.status(400).json({ 
+        message: `Cannot delete product. It is being used in ${componentsUsingProduct} final product component(s). Please remove it from all final products first.` 
+      });
+    }
+
     await product.destroy();
     res.json({ message: "Product deleted successfully" });
   } catch (error) {
