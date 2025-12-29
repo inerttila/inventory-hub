@@ -6,6 +6,8 @@ COPY package.json ./
 COPY package-lock.json* ./
 RUN npm ci || npm install
 COPY server ./server
+
+
 FROM node:18-alpine
 
 WORKDIR /app
@@ -13,6 +15,8 @@ RUN apk add --no-cache python3 make g++
 COPY package.json ./
 COPY package-lock.json* ./
 RUN npm ci --only=production || npm install --only=production
-
+COPY --from=builder /app/server ./server
+RUN mkdir -p uploads
+RUN mkdir -p client/build
 EXPOSE 5000
 CMD ["npm", "start"]
