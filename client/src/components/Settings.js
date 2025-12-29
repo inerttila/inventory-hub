@@ -175,7 +175,7 @@ const Settings = ({ onClose }) => {
     <div className="settings-overlay" onClick={onClose}>
       <div className="settings-content" onClick={(e) => e.stopPropagation()}>
         <div className="settings-header">
-          <h2>⚙️ Settings</h2>
+          <h2>⚙️ Management</h2>
           <button className="btn-close" onClick={onClose}>
             ×
           </button>

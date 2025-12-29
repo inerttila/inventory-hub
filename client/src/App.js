@@ -26,9 +26,21 @@ import { stackClientApp } from "./stack/client";
 
 function HandlerRoutes() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const isAccountSettings = location.pathname === "/handler/account-settings";
 
   return (
-    <StackHandler app={stackClientApp} location={location.pathname} fullPage />
+    <div style={{ position: "relative" }}>
+      {isAccountSettings && (
+        <button
+          onClick={() => navigate(-1)}
+          className="go-back-btn"
+        >
+          <span>←</span> Go Back
+        </button>
+      )}
+      <StackHandler app={stackClientApp} location={location.pathname} fullPage />
+    </div>
   );
 }
 
