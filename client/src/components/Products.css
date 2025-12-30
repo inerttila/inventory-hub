@@ -97,6 +97,37 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
+
+.product-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 0.5rem;
+}
+
+.product-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #007bff;
+}
+
+.product-card.selected {
+  border: 2px solid #007bff;
+  background: #f0f7ff;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
 .product-header {
   display: flex;
   justify-content: space-between;
