@@ -6,6 +6,7 @@ import "./FinalProducts.css";
 import { useNotification } from "../context/NotificationContext";
 import { useCurrency } from "../context/CurrencyContext";
 import ConfirmDialog from "./ConfirmDialog";
+import Spinner from "./Spinner";
 
 const FinalProducts = () => {
   const { showSuccess, showError, showWarning } = useNotification();
@@ -35,15 +36,19 @@ const FinalProducts = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedCards, setExpandedCards] = useState({});
   const [uploadingImages, setUploadingImages] = useState({}); // { index: progress }
+  const [loading, setLoading] = useState(true);
   const cardRefs = useRef({});
 
   const fetchFinalProducts = useCallback(async () => {
     try {
+      setLoading(true);
       const res = await apiClient.get("/api/final-products");
       setFinalProducts(res.data);
     } catch (error) {
       console.error("Error fetching final products:", error);
       showError("Error loading final products");
+    } finally {
+      setLoading(false);
     }
   }, [showError]);
 
@@ -655,6 +660,16 @@ const FinalProducts = () => {
   };
 
   const totalPrice = calculateTotalPrice();
+
+  if (loading) {
+    return (
+      <div className="final-products-container">
+        <div className="loading-spinner">
+          <Spinner size={32} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="final-products-container">

@@ -4,6 +4,7 @@ import "./Settings.css";
 import { useNotification } from "../context/NotificationContext";
 import { useCurrency } from "../context/CurrencyContext";
 import ConfirmDialog from "./ConfirmDialog";
+import Spinner from "./Spinner";
 
 const Settings = ({ onClose }) => {
   const { showSuccess, showError } = useNotification();
@@ -40,6 +41,10 @@ const Settings = ({ onClose }) => {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [loadingCurrencies, setLoadingCurrencies] = useState(true);
+  const [loadingClients, setLoadingClients] = useState(true);
+  const [loadingBrands, setLoadingBrands] = useState(true);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const [brandFormData, setBrandFormData] = useState({
     name: "",
     description: "",
@@ -51,41 +56,53 @@ const Settings = ({ onClose }) => {
 
   const fetchCurrencies = useCallback(async () => {
     try {
+      setLoadingCurrencies(true);
       const res = await apiClient.get("/api/currencies");
       setCurrencies(res.data);
     } catch (error) {
       console.error("Error fetching currencies:", error);
       showError("Error loading currencies");
+    } finally {
+      setLoadingCurrencies(false);
     }
   }, [showError]);
 
   const fetchClients = useCallback(async () => {
     try {
+      setLoadingClients(true);
       const res = await apiClient.get("/api/clients");
       setClients(res.data);
     } catch (error) {
       console.error("Error fetching clients:", error);
       showError("Error loading clients");
+    } finally {
+      setLoadingClients(false);
     }
   }, [showError]);
 
   const fetchBrands = useCallback(async () => {
     try {
+      setLoadingBrands(true);
       const res = await apiClient.get("/api/brands");
       setBrands(res.data);
     } catch (error) {
       console.error("Error fetching brands:", error);
       showError("Error loading brands");
+    } finally {
+      setLoadingBrands(false);
     }
   }, [showError]);
 
   const fetchCategories = useCallback(async () => {
     try {
+      setLoadingCategories(true);
       const res = await apiClient.get("/api/categories");
       setCategories(res.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
       showError("Error loading categories");
+    } finally {
+      setLoadingCategories(false);
     }
   }, [showError]);
 
@@ -331,7 +348,8 @@ const Settings = ({ onClose }) => {
           </button>
         </div>
 
-        <div className="settings-section">
+        <div className="settings-sections-container">
+        <div className={`settings-section ${isCurrencyOpen ? "active" : ""}`}>
           <div
             className={`section-header clickable ${isCurrencyOpen ? "active" : ""}`}
             onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
@@ -363,7 +381,11 @@ const Settings = ({ onClose }) => {
 
           {isCurrencyOpen && (
             <div className="currencies-list">
-              {currencies.length === 0 ? (
+              {loadingCurrencies ? (
+                <div className="section-loading">
+                  <Spinner size={24} />
+                </div>
+              ) : currencies.length === 0 ? (
                 <p className="no-currencies">No currencies added yet.</p>
               ) : (
                 currencies.map((currency) => (
@@ -484,7 +506,7 @@ const Settings = ({ onClose }) => {
         )}
 
         {/* Clients Section */}
-        <div className="settings-section">
+        <div className={`settings-section ${isClientsOpen ? "active" : ""}`}>
           <div
             className={`section-header clickable ${isClientsOpen ? "active" : ""}`}
             onClick={() => setIsClientsOpen(!isClientsOpen)}
@@ -516,7 +538,11 @@ const Settings = ({ onClose }) => {
 
           {isClientsOpen && (
             <div className="currencies-list">
-              {clients.length === 0 ? (
+              {loadingClients ? (
+                <div className="section-loading">
+                  <Spinner size={24} />
+                </div>
+              ) : clients.length === 0 ? (
                 <p className="no-currencies">No clients added yet.</p>
               ) : (
                 clients.map((client) => (
@@ -570,7 +596,7 @@ const Settings = ({ onClose }) => {
         </div>
 
         {/* Brands Section */}
-        <div className="settings-section">
+        <div className={`settings-section ${isBrandsOpen ? "active" : ""}`}>
           <div
             className={`section-header clickable ${isBrandsOpen ? "active" : ""}`}
             onClick={() => setIsBrandsOpen(!isBrandsOpen)}
@@ -602,7 +628,11 @@ const Settings = ({ onClose }) => {
 
           {isBrandsOpen && (
             <div className="currencies-list">
-              {brands.length === 0 ? (
+              {loadingBrands ? (
+                <div className="section-loading">
+                  <Spinner size={24} />
+                </div>
+              ) : brands.length === 0 ? (
                 <p className="no-currencies">No brands added yet.</p>
               ) : (
                 brands.map((brand) => (
@@ -646,7 +676,7 @@ const Settings = ({ onClose }) => {
         </div>
 
         {/* Categories Section */}
-        <div className="settings-section">
+        <div className={`settings-section ${isCategoriesOpen ? "active" : ""}`}>
           <div
             className={`section-header clickable ${isCategoriesOpen ? "active" : ""}`}
             onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
@@ -678,7 +708,11 @@ const Settings = ({ onClose }) => {
 
           {isCategoriesOpen && (
             <div className="currencies-list">
-              {categories.length === 0 ? (
+              {loadingCategories ? (
+                <div className="section-loading">
+                  <Spinner size={24} />
+                </div>
+              ) : categories.length === 0 ? (
                 <p className="no-currencies">No categories added yet.</p>
               ) : (
                 categories.map((category) => (
@@ -719,6 +753,7 @@ const Settings = ({ onClose }) => {
               )}
             </div>
           )}
+        </div>
         </div>
 
         {/* Client Modal */}

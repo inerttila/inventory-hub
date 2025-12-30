@@ -2,6 +2,14 @@
   padding: 2rem 0;
 }
 
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: #000;
+}
+
 .page-header {
   display: flex;
   justify-content: space-between;

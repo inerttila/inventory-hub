@@ -342,10 +342,11 @@
 }
 
 .loading-spinner {
-  text-align: center;
-  padding: 4rem;
-  color: #666;
-  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: #000;
 }
 
 .modal-overlay {

@@ -4,6 +4,7 @@ import './Products.css';
 import { useNotification } from '../context/NotificationContext';
 import { useCurrency } from '../context/CurrencyContext';
 import ConfirmDialog from './ConfirmDialog';
+import Spinner from './Spinner';
 
 const Products = () => {
   const { showSuccess, showError } = useNotification();
@@ -29,14 +30,18 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedItems, setSelectedItems] = useState([]);
   const [showSelectionMode, setShowSelectionMode] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchProducts = useCallback(async () => {
     try {
+      setLoading(true);
       const res = await apiClient.get('/api/products');
       setProducts(res.data);
     } catch (error) {
       console.error('Error fetching products:', error);
       showError('Error loading products');
+    } finally {
+      setLoading(false);
     }
   }, [showError]);
 
@@ -194,6 +199,16 @@ const Products = () => {
       },
     });
   };
+
+  if (loading) {
+    return (
+      <div className="products-container">
+        <div className="loading-spinner">
+          <Spinner size={32} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="products-container">

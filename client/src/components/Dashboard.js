@@ -17,6 +17,7 @@ import apiClient from '../utils/axiosConfig';
 import './Dashboard.css';
 import { useNotification } from '../context/NotificationContext';
 import { useCurrency } from '../context/CurrencyContext';
+import Spinner from './Spinner';
 
 const Dashboard = () => {
   const { showError, showSuccess } = useNotification();
@@ -519,7 +520,9 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="dashboard-container">
-        <div className="loading-spinner">Loading dashboard...</div>
+        <div className="loading-spinner">
+          <Spinner size={32} />
+        </div>
       </div>
     );
   }
