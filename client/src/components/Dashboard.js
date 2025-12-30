@@ -569,7 +569,6 @@ const Dashboard = () => {
             <div className="stat-content">
               <h3>Categories</h3>
               <p className="stat-value">{stats.totalCategories}</p>
-              <p className="stat-description">Use Settings ⚙️ to manage</p>
             </div>
           </div>
 
@@ -578,7 +577,6 @@ const Dashboard = () => {
             <div className="stat-content">
               <h3>Brands</h3>
               <p className="stat-value">{stats.totalBrands}</p>
-              <p className="stat-description">Use Settings ⚙️ to manage</p>
             </div>
           </div>
         </div>
@@ -799,4 +797,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
