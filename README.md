@@ -1,5 +1,7 @@
 # Inventory Management System
 
+![Inventory Management System UI](image.png)
+
 A full-stack inventory management application for managing products, creating final products with component-based pricing, and handling multi-currency transactions. Built with user authentication and multi-tenant support.
 
 ## Features
