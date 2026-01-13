@@ -49,13 +49,13 @@ services:
       context: ./client
       dockerfile: Dockerfile.prod
       args:
-        REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:5000}
+        REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:5001}
         REACT_APP_STACK_PROJECT_ID: ${REACT_APP_STACK_PROJECT_ID}
         REACT_APP_STACK_PUBLISHABLE_CLIENT_KEY: ${REACT_APP_STACK_PUBLISHABLE_CLIENT_KEY}
     container_name: inventory_frontend_prod
     restart: always
     ports:
-      - "${FRONTEND_PORT:-80}:80"
+      - "${FRONTEND_PORT:-81}:81"
     depends_on:
       - backend
     networks:

@@ -5,5 +5,5 @@ COPY package.json package-lock.json ./
 RUN npm install
 COPY server ./server
 RUN mkdir -p uploads
-EXPOSE 5000
+EXPOSE 5001
 CMD ["npm", "run", "dev"]
