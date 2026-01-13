@@ -23,7 +23,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.service
     container_name: inventory_backend_prod_test
     restart: always
     ports:
@@ -48,7 +48,7 @@ services:
   frontend:
     build:
       context: ./client
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.service
       args:
         REACT_APP_API_URL: ${REACT_APP_API_URL:-}
         REACT_APP_STACK_PROJECT_ID: ${REACT_APP_STACK_PROJECT_ID}
