@@ -52,7 +52,7 @@ function Navbar({ onSettingsClick }) {
       <div className="nav-container">
         <h1 className="nav-logo">
           <img
-            src="https://skaitech.al/wp-content/uploads/2024/03/icons8-source-code-100.png"
+            src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&amp;rid=giphy.gif"
             alt="Logo"
             style={{
               marginRight: "12px",
@@ -190,3 +190,4 @@ function App() {
 }
 
 export default App;
+
