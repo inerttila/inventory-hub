@@ -4,8 +4,8 @@
   "description": "Inventory app with product management and price estimation",
   "main": "server/index.js",
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "nodemon server/index.js",
+    "start": "node --no-deprecation server/index.js",
+    "dev": "nodemon --exec \"node --no-deprecation\" server/index.js",
     "client": "cd client && npm start",
     "build": "cd client && npm run build",
     "install-all": "npm install && cd client && npm install"

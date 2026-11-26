@@ -15,7 +15,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import "./App.css";
-import Categories from "./components/Categories";
+import Dashboard from "./components/Dashboard";
 import FinalProducts from "./components/FinalProducts";
 import Products from "./components/Products";
 import Settings from "./components/Settings";
@@ -46,42 +46,118 @@ function HandlerRoutes() {
 
 function Navbar({ onSettingsClick }) {
   const user = useUser();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   return (
-    <nav className="navbar">
-      <div className="nav-container">
-        <h1 className="nav-logo">
-          <img
-            src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&amp;rid=giphy.gif"
-            alt="Logo"
-            style={{
-              marginRight: "12px",
-              verticalAlign: "middle",
-              cursor: "pointer",
-            }}
-            onClick={() => window.location.reload()}
-          />
-          <span style={{ verticalAlign: "middle" }}>Koli Duroplast</span>
-        </h1>
-        <div className="nav-right">
-          <div className="nav-links">
-            <Link to="/" className="nav-link">
-              Products
-            </Link>
-            {/* <Link to="/categories" className="nav-link">
-                      Categories
-                    </Link> */}
-            <Link to="/final-products" className="nav-link">
-              Final Products
-            </Link>
+    <>
+      <nav className="navbar">
+        <div className="nav-container">
+          <h1 className="nav-logo">
+            <img
+              src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&amp;rid=giphy.gif"
+              alt="Logo"
+              style={{
+                marginRight: "12px",
+                verticalAlign: "middle",
+                cursor: "pointer",
+              }}
+              onClick={() => window.location.href = "/"}
+            />
+            <span style={{ verticalAlign: "middle" }}>Service</span>
+          </h1>
+          <button 
+            className="mobile-menu-btn" 
+            onClick={toggleMobileMenu}
+            aria-label="Toggle menu"
+          >
+            <span className={`hamburger ${isMobileMenuOpen ? 'active' : ''}`}>
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+          </button>
+          <div className="nav-right">
+            <div className="nav-links">
+              <Link to="/" className="nav-link">
+                Dashboard
+              </Link>
+              <Link to="/products" className="nav-link">
+                Products
+              </Link>
+              <Link to="/final-products" className="nav-link">
+                Final Products
+              </Link>
+            </div>
+            {user && (
+              <div className="user-profile-section">
+                <UserButton
+                  showUserInfo={true}
+                  afterSignOutUrl="/handler/sign-in"
+                  afterSignOut={() => {
+                    // Clear the global user ID when user signs out
+                    window.__stackUserId = null;
+                  }}
+                  appearance={{
+                    elements: {
+                      userButtonAvatarBox: {
+                        width: "40px",
+                        height: "40px",
+                      },
+                    },
+                  }}
+                />
+              </div>
+            )}
+            <button
+              className="settings-icon-btn"
+              onClick={onSettingsClick}
+              title="Settings"
+            >
+              <span>⚙</span>
+            </button>
           </div>
+        </div>
+      </nav>
+      
+      {/* Mobile Menu Overlay */}
+      <div 
+        className={`mobile-menu-overlay ${isMobileMenuOpen ? 'active' : ''}`}
+        onClick={closeMobileMenu}
+      ></div>
+      
+      {/* Mobile Menu Sidebar */}
+      <div className={`mobile-menu ${isMobileMenuOpen ? 'active' : ''}`}>
+        <div className="mobile-menu-header">
+          <h2>Menu</h2>
+        </div>
+        <div className="mobile-menu-content">
+          <Link to="/" className="mobile-nav-link" onClick={closeMobileMenu}>
+            <span className="mobile-nav-icon">📊</span>
+            <span>Dashboard</span>
+          </Link>
+          <Link to="/products" className="mobile-nav-link" onClick={closeMobileMenu}>
+            <span className="mobile-nav-icon">📦</span>
+            <span>Products</span>
+          </Link>
+          <Link to="/final-products" className="mobile-nav-link" onClick={closeMobileMenu}>
+            <span className="mobile-nav-icon">🏭</span>
+            <span>Final Products</span>
+          </Link>
+          <div className="mobile-menu-divider"></div>
           {user && (
-            <div className="user-profile-section">
+            <div className="mobile-user-section">
               <UserButton
                 showUserInfo={true}
                 afterSignOutUrl="/handler/sign-in"
                 afterSignOut={() => {
-                  // Clear the global user ID when user signs out
                   window.__stackUserId = null;
                 }}
                 appearance={{
@@ -96,15 +172,18 @@ function Navbar({ onSettingsClick }) {
             </div>
           )}
           <button
-            className="settings-icon-btn"
-            onClick={onSettingsClick}
-            title="Settings"
+            className="mobile-settings-btn"
+            onClick={() => {
+              onSettingsClick();
+              closeMobileMenu();
+            }}
           >
-            <span>⚙</span>
+            <span className="mobile-nav-icon">⚙</span>
+            <span>Settings</span>
           </button>
         </div>
       </div>
-    </nav>
+    </>
   );
 }
 
@@ -143,8 +222,8 @@ function AppContent() {
 
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<Products />} />
-          <Route path="/categories" element={<Categories />} />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/products" element={<Products />} />
           <Route path="/final-products" element={<FinalProducts />} />
         </Routes>
       </main>

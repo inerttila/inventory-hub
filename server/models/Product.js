@@ -50,6 +50,14 @@ module.exports = (sequelize) => {
           key: "id",
         },
       },
+      brandId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: "brands",
+          key: "id",
+        },
+      },
       userId: {
         type: DataTypes.STRING,
         allowNull: false,

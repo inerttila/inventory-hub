@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { Product, Currency } = require("../models");
+const { Product, Currency, Brand, Component, FinalProduct } = require("../models");
 const { authenticateUser } = require("../middleware/auth");
 
 // Apply auth middleware to all routes
@@ -16,6 +16,11 @@ router.get("/", async (req, res) => {
           model: Currency,
           as: "currency",
           attributes: ["id", "code", "name", "symbol"],
+        },
+        {
+          model: Brand,
+          as: "brand",
+          attributes: ["id", "name", "description"],
         },
       ],
       order: [["createdAt", "DESC"]],
@@ -36,6 +41,11 @@ router.get("/:id", async (req, res) => {
           model: Currency,
           as: "currency",
           attributes: ["id", "code", "name", "symbol"],
+        },
+        {
+          model: Brand,
+          as: "brand",
+          attributes: ["id", "name", "description"],
         },
       ],
     });
@@ -61,6 +71,11 @@ router.post("/", async (req, res) => {
           model: Currency,
           as: "currency",
           attributes: ["id", "code", "name", "symbol"],
+        },
+        {
+          model: Brand,
+          as: "brand",
+          attributes: ["id", "name", "description"],
         },
       ],
     });
@@ -96,6 +111,11 @@ router.put("/:id", async (req, res) => {
           as: "currency",
           attributes: ["id", "code", "name", "symbol"],
         },
+        {
+          model: Brand,
+          as: "brand",
+          attributes: ["id", "name", "description"],
+        },
       ],
     });
     res.json(updatedProduct);
@@ -117,9 +137,41 @@ router.delete("/:id", async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
+
+    // Check if product is being used in any components
+    const components = await Component.findAll({
+      where: { productId: req.params.id, userId: req.userId },
+      include: [
+        {
+          model: FinalProduct,
+          as: 'finalProduct',
+          attributes: ['id', 'name'],
+          where: { userId: req.userId },
+          required: true,
+        },
+      ],
+    });
+
+    if (components.length > 0) {
+      // Get unique final product names
+      const finalProductNames = [...new Set(components.map(comp => comp.finalProduct.name))];
+      const finalProductNamesList = finalProductNames.join(', ');
+      
+      return res.status(400).json({ 
+        message: `Cannot delete this product because it is being used in the final product: ${finalProductNamesList}`,
+        finalProducts: finalProductNames,
+      });
+    }
+
     await product.destroy();
     res.json({ message: "Product deleted successfully" });
   } catch (error) {
+    // Check if it's a foreign key constraint error
+    if (error.name === 'SequelizeForeignKeyConstraintError') {
+      return res.status(400).json({ 
+        message: "Cannot delete this product because it is being used in one or more final products" 
+      });
+    }
     res.status(500).json({ message: error.message });
   }
 });

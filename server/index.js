@@ -60,6 +60,7 @@ connectWithRetry();
 // Routes
 app.use('/api/products', require('./routes/products'));
 app.use('/api/categories', require('./routes/categories'));
+app.use('/api/brands', require('./routes/brands'));
 app.use('/api/final-products', require('./routes/finalProducts'));
 app.use('/api/currencies', require('./routes/currencies'));
 app.use('/api/clients', require('./routes/clients'));
@@ -83,6 +84,7 @@ app.get('*', (req, res, next) => {
       endpoints: {
         products: '/api/products',
         categories: '/api/categories',
+        brands: '/api/brands',
         finalProducts: '/api/final-products',
         currencies: '/api/currencies',
         clients: '/api/clients',

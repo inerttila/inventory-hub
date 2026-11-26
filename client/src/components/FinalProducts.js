@@ -1,14 +1,17 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import apiClient from "../utils/axiosConfig";
 import * as XLSX from "xlsx-js-style";
 import "./FinalProducts.css";
 import { useNotification } from "../context/NotificationContext";
 import { useCurrency } from "../context/CurrencyContext";
 import ConfirmDialog from "./ConfirmDialog";
+import Spinner from "./Spinner";
 
 const FinalProducts = () => {
   const { showSuccess, showError, showWarning } = useNotification();
   const { formatPrice, currencies } = useCurrency();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [finalProducts, setFinalProducts] = useState([]);
   const [products, setProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -33,14 +36,19 @@ const FinalProducts = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedCards, setExpandedCards] = useState({});
   const [uploadingImages, setUploadingImages] = useState({}); // { index: progress }
+  const [loading, setLoading] = useState(true);
+  const cardRefs = useRef({});
 
   const fetchFinalProducts = useCallback(async () => {
     try {
+      setLoading(true);
       const res = await apiClient.get("/api/final-products");
       setFinalProducts(res.data);
     } catch (error) {
       console.error("Error fetching final products:", error);
       showError("Error loading final products");
+    } finally {
+      setLoading(false);
     }
   }, [showError]);
 
@@ -68,6 +76,34 @@ const FinalProducts = () => {
     fetchProducts();
     fetchClients();
   }, [fetchFinalProducts, fetchProducts, fetchClients]);
+
+  // Handle URL parameter to expand and scroll to specific product
+  useEffect(() => {
+    const productId = searchParams.get("id");
+    if (productId && finalProducts.length > 0) {
+      const id = parseInt(productId);
+      const product = finalProducts.find((p) => p.id === id);
+      if (product) {
+        // Expand the card
+        setExpandedCards((prev) => ({
+          ...prev,
+          [id]: true,
+        }));
+        
+        // Scroll to the card after a short delay to ensure it's rendered
+        setTimeout(() => {
+          const cardElement = cardRefs.current[id];
+          if (cardElement) {
+            cardElement.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }, 100);
+        
+        // Remove the id parameter from URL after handling
+        searchParams.delete("id");
+        setSearchParams(searchParams, { replace: true });
+      }
+    }
+  }, [finalProducts, searchParams, setSearchParams]);
 
   const handleAddComponent = () => {
     setFormData({
@@ -625,6 +661,16 @@ const FinalProducts = () => {
 
   const totalPrice = calculateTotalPrice();
 
+  if (loading) {
+    return (
+      <div className="final-products-container">
+        <div className="loading-spinner">
+          <Spinner size={32} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="final-products-container">
       <div className="page-header">
@@ -678,6 +724,7 @@ const FinalProducts = () => {
             return (
               <div
                 key={product.id}
+                ref={(el) => (cardRefs.current[product.id] = el)}
                 className={`final-product-card ${
                   isExpanded ? "expanded" : "collapsed"
                 }`}

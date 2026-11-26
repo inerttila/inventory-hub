@@ -18,5 +18,5 @@ RUN npm ci --only=production || npm install --only=production
 COPY --from=builder /app/server ./server
 RUN mkdir -p uploads
 RUN mkdir -p client/build
-EXPOSE 5000
+EXPOSE 5001
 CMD ["npm", "start"]
