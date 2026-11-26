@@ -24,7 +24,7 @@ services:
     ports:
       - "5001:5001"
     environment:
-      STACK_SECRET_SERVER_KEY: ssk_pszfgybb1nkst3zx1hztj0kmja312ekjnazyt6rkbsgr0
+      STACK_SECRET_SERVER_KEY: 
 
       DB_HOST: postgres
       DB_PORT: 5433
@@ -49,8 +49,8 @@ services:
     environment:
       PORT: 3001
       REACT_APP_API_URL: http://localhost:5001
-      REACT_APP_STACK_PROJECT_ID: f07a34bb-9716-428b-93e0-5a58ceeb7cfc
-      REACT_APP_STACK_PUBLISHABLE_CLIENT_KEY: pck_6ks2zbrrb38z037m0maqnrt5s1dfnzt2gkpqq369zgyy0
+      REACT_APP_STACK_PROJECT_ID:
+      REACT_APP_STACK_PUBLISHABLE_CLIENT_KEY: 
     depends_on:
       - backend
 
